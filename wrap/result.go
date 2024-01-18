@@ -12,6 +12,8 @@ import (
 	"text/template"
 
 	"github.com/Songmu/wrapcommander"
+	"golang.org/x/text/encoding/unicode"
+	"golang.org/x/text/transform"
 )
 
 type result struct {
@@ -59,7 +61,9 @@ func (re *result) loadLastResult() (*result, error) {
 	}
 	defer f.Close()
 
-	err = json.NewDecoder(f).Decode(prevRe)
+	fallback := unicode.UTF8.NewDecoder()
+	r := transform.NewReader(f, unicode.BOMOverride(fallback))
+	err = json.NewDecoder(r).Decode(prevRe)
 	return prevRe, err
 }
 
