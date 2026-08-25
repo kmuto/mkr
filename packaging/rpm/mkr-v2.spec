@@ -35,6 +35,23 @@ rm -f %{buildroot}%{_bindir}/%{name}
 %{_bindir}/%{name}
 
 %changelog
+* Tue Aug 25 2026 <mackerel-developers@hatena.ne.jp> - 0.66.0
+- Bump docker/setup-buildx-action from 4.2.0 to 4.3.0 (by dependabot[bot])
+- Bump github.com/urfave/cli/v3 from 3.10.1 to 3.11.0 (by dependabot[bot])
+- Bump github.com/mackerelio/mackerel-client-go from 0.46.0 to 0.47.0 in the stable-packages group (by dependabot[bot])
+- Bump github.com/stretchr/testify from 1.12.0 to 1.12.1 in the dev-dependencies group (by dependabot[bot])
+- Support the --jq option in mkr dashboards (by itchyny)
+- Bump golang.org/x/text from 0.40.0 to 0.41.0 in the stable-packages group (by dependabot[bot])
+- Bump github.com/stretchr/testify from 1.11.1 to 1.12.0 in the dev-dependencies group (by dependabot[bot])
+- Fix the release URL validation of mkr plugin install (by itchyny)
+- Validate the range of the limit flag of the alerts commands (by itchyny)
+- Follow redirects for repository transfers in getTagFromReleasesURL (by kazeburo)
+- Bump github.com/mackerelio/mackerel-client-go from 0.45.1 to 0.46.0 in the stable-packages group (by dependabot[bot])
+- Fix mkr alerts list dropping alerts when multiple services are given (by itchyny)
+- Fix data race in mkr wrap merging command output (by itchyny)
+- Bump docker/login-action from 4.5.0 to 4.6.0 (by dependabot[bot])
+- alerts list added detail of "Check monitor" (by yseto)
+
 * Wed Jul 29 2026 <mackerel-developers@hatena.ne.jp> - 0.65.0
 - Bump aws-actions/configure-aws-credentials from 6.2.2 to 6.2.3 (by dependabot[bot])
 - Bump docker/login-action from 4.4.0 to 4.5.0 (by dependabot[bot])
