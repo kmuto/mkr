@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.66.0 (2026-08-25)
+
+* Bump docker/setup-buildx-action from 4.2.0 to 4.3.0 #878 (dependabot[bot])
+* Bump github.com/urfave/cli/v3 from 3.10.1 to 3.11.0 #877 (dependabot[bot])
+* Bump github.com/mackerelio/mackerel-client-go from 0.46.0 to 0.47.0 in the stable-packages group #876 (dependabot[bot])
+* Bump github.com/stretchr/testify from 1.12.0 to 1.12.1 in the dev-dependencies group #875 (dependabot[bot])
+* Support the --jq option in mkr dashboards #873 (itchyny)
+* Bump golang.org/x/text from 0.40.0 to 0.41.0 in the stable-packages group #872 (dependabot[bot])
+* Bump github.com/stretchr/testify from 1.11.1 to 1.12.0 in the dev-dependencies group #871 (dependabot[bot])
+* Fix the release URL validation of mkr plugin install #870 (itchyny)
+* Validate the range of the limit flag of the alerts commands #869 (itchyny)
+* Follow redirects for repository transfers in getTagFromReleasesURL #868 (kazeburo)
+* Bump github.com/mackerelio/mackerel-client-go from 0.45.1 to 0.46.0 in the stable-packages group #867 (dependabot[bot])
+* Fix mkr alerts list dropping alerts when multiple services are given #866 (itchyny)
+* Fix data race in mkr wrap merging command output #865 (itchyny)
+* Bump docker/login-action from 4.5.0 to 4.6.0 #864 (dependabot[bot])
+* alerts list added detail of "Check monitor" #858 (yseto)
+
+
 ## 0.65.0 (2026-07-29)
 
 * Bump aws-actions/configure-aws-credentials from 6.2.2 to 6.2.3 #862 (dependabot[bot])
