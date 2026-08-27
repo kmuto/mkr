@@ -33,7 +33,11 @@ type wrap struct {
 }
 
 func (wr *wrap) run(ctx context.Context) error {
+	otelCleanup := wr.setupOTel()
 	re := wr.runCmd(ctx)
+	if otelCleanup != nil {
+		otelCleanup(re)
+	}
 	if err := wr.report(context.Background(), re); err != nil {
 		msg, _ := re.buildMsg(wr.detail)
 		logger.Logf("error", "failed to post following report to Mackerel: %s\n%s", err, msg)
