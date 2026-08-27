@@ -17,9 +17,14 @@ import (
 	"github.com/mackerelio/mkr/logger"
 )
 
-func otelEnabled() bool {
-	return os.Getenv("OTEL_EXPORTER_OTLP_ENDPOINT") != "" ||
-		os.Getenv("OTEL_EXPORTER_OTLP_LOGS_ENDPOINT") != ""
+const mackerelOTLPEndpoint = "otlp-vaxila.mackerelio.com"
+
+func envTruthy(key string) bool {
+	switch strings.ToLower(os.Getenv(key)) {
+	case "1", "true", "yes":
+		return true
+	}
+	return false
 }
 
 type otelLogExporter struct {
@@ -27,8 +32,8 @@ type otelLogExporter struct {
 	logger   otellog.Logger
 }
 
-func newOTelLogExporter(ctx context.Context, hostID string) (*otelLogExporter, error) {
-	exporter, err := otlploghttp.New(ctx)
+func newOTelLogExporter(ctx context.Context, hostID string, exporterOpts []otlploghttp.Option) (*otelLogExporter, error) {
+	exporter, err := otlploghttp.New(ctx, exporterOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -86,13 +91,29 @@ func (e *otelLogExporter) emitSummary(re *result, checkName string) {
 }
 
 func (wr *wrap) setupOTel() func(re *result) {
-	if !otelEnabled() {
+	var exporterOpts []otlploghttp.Option
+
+	if os.Getenv("OTEL_EXPORTER_OTLP_ENDPOINT") != "" || os.Getenv("OTEL_EXPORTER_OTLP_LOGS_ENDPOINT") != "" {
+		// Explicit OTLP endpoint: exporter reads config from standard env vars
+	} else if envTruthy("MKR_WRAP_OTEL_LOG") {
+		if wr.apikey == "" {
+			logger.Log("warning", "[mkr wrap] MKR_WRAP_OTEL_LOG is set but no API key available, skipping OTel log export")
+			return nil
+		}
+		exporterOpts = []otlploghttp.Option{
+			otlploghttp.WithEndpoint(mackerelOTLPEndpoint),
+			otlploghttp.WithHeaders(map[string]string{
+				"Mackerel-Api-Key": wr.apikey,
+				"Accept":          "*/*",
+			}),
+		}
+	} else {
 		return nil
 	}
 
 	ctx := context.Background()
 	checkName := (&result{Cmd: wr.cmd, Name: wr.name}).checkName()
-	exp, err := newOTelLogExporter(ctx, wr.hostID)
+	exp, err := newOTelLogExporter(ctx, wr.hostID, exporterOpts)
 	if err != nil {
 		logger.Logf("warning", "[mkr wrap] failed to initialize OpenTelemetry: %s", err)
 		return nil

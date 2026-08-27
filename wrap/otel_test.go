@@ -3,6 +3,7 @@ package wrap
 import (
 	"bytes"
 	"context"
+	"os"
 	"sync"
 	"testing"
 
@@ -118,21 +119,51 @@ func TestOTelLineWriter_FlushEmpty(t *testing.T) {
 	}
 }
 
-func TestOTelEnabled(t *testing.T) {
+func TestEnvTruthy(t *testing.T) {
+	key := "TEST_TRUTHY_VAR"
+	tests := []struct {
+		value string
+		want  bool
+	}{
+		{"", false},
+		{"0", false},
+		{"no", false},
+		{"1", true},
+		{"true", true},
+		{"True", true},
+		{"TRUE", true},
+		{"yes", true},
+		{"Yes", true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.value, func(t *testing.T) {
+			os.Setenv(key, tt.value)
+			t.Cleanup(func() { os.Unsetenv(key) })
+			if got := envTruthy(key); got != tt.want {
+				t.Errorf("envTruthy(%q) with value %q = %v, want %v", key, tt.value, got, tt.want)
+			}
+		})
+	}
+}
+
+func TestSetupOTel_Disabled(t *testing.T) {
 	t.Setenv("OTEL_EXPORTER_OTLP_ENDPOINT", "")
 	t.Setenv("OTEL_EXPORTER_OTLP_LOGS_ENDPOINT", "")
-	if otelEnabled() {
-		t.Error("expected otelEnabled() to return false when env vars are empty")
-	}
+	t.Setenv("MKR_WRAP_OTEL_LOG", "")
 
-	t.Setenv("OTEL_EXPORTER_OTLP_ENDPOINT", "http://localhost:4318")
-	if !otelEnabled() {
-		t.Error("expected otelEnabled() to return true when OTEL_EXPORTER_OTLP_ENDPOINT is set")
+	wr := &wrap{cmd: []string{"echo", "hi"}, outStream: os.Stdout, errStream: os.Stderr}
+	if cleanup := wr.setupOTel(); cleanup != nil {
+		t.Error("expected setupOTel to return nil when no env vars are set")
 	}
+}
 
+func TestSetupOTel_MackerelDirect_NoAPIKey(t *testing.T) {
 	t.Setenv("OTEL_EXPORTER_OTLP_ENDPOINT", "")
-	t.Setenv("OTEL_EXPORTER_OTLP_LOGS_ENDPOINT", "http://localhost:4318")
-	if !otelEnabled() {
-		t.Error("expected otelEnabled() to return true when OTEL_EXPORTER_OTLP_LOGS_ENDPOINT is set")
+	t.Setenv("OTEL_EXPORTER_OTLP_LOGS_ENDPOINT", "")
+	t.Setenv("MKR_WRAP_OTEL_LOG", "1")
+
+	wr := &wrap{cmd: []string{"echo", "hi"}, apikey: "", outStream: os.Stdout, errStream: os.Stderr}
+	if cleanup := wr.setupOTel(); cleanup != nil {
+		t.Error("expected setupOTel to return nil when MKR_WRAP_OTEL_LOG is set but apikey is empty")
 	}
 }
