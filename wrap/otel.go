@@ -5,6 +5,7 @@ import (
 	"context"
 	"io"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -20,11 +21,8 @@ import (
 const mackerelOTLPEndpoint = "otlp-vaxila.mackerelio.com"
 
 func envTruthy(key string) bool {
-	switch strings.ToLower(os.Getenv(key)) {
-	case "1", "true", "yes":
-		return true
-	}
-	return false
+	v, _ := strconv.ParseBool(os.Getenv(key))
+	return v
 }
 
 type otelLogExporter struct {

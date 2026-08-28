@@ -127,13 +127,14 @@ func TestEnvTruthy(t *testing.T) {
 	}{
 		{"", false},
 		{"0", false},
+		{"f", false},
+		{"false", false},
 		{"no", false},
 		{"1", true},
+		{"t", true},
 		{"true", true},
 		{"True", true},
 		{"TRUE", true},
-		{"yes", true},
-		{"Yes", true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.value, func(t *testing.T) {
